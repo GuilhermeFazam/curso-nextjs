@@ -1,23 +1,17 @@
 import { GetServerSideProps } from 'next';
 import { Title } from '@/styles/pages/Home';
+import Link from 'next/link';
 import SEO from '@/components/SEO';
-
-interface IProduct {
-    id: string;
-    title: string;
-}
+import { client } from '@/lib/priscmic';
+import Priscmic from 'prismic-javascript';
+import PriscmicDOM from 'prismic-dom';
+import { Document } from 'prismic-javascript/types/documents';
 
 interface HomeProps {
-    recommendedProducts: IProduct[];
+    recommendedProducts: Document[];
 }
 
 export default function Home({ recommendedProducts }: HomeProps) {
-    async function handleSum() {
-        console.log(process.env.NEXT_PUBLIC_API_URL);
-        const math = (await import('../lib/math')).default;
-        console.error(math.sum(3, 5));
-    }
-
     return (
         <div>
             <SEO
@@ -32,13 +26,18 @@ export default function Home({ recommendedProducts }: HomeProps) {
                     <ul>
                         {recommendedProducts.map((recommendedProduct) => (
                             <li key={recommendedProduct.id}>
-                                {recommendedProduct.title}
+                                <Link
+                                    href={`/catalogs/products/${recommendedProduct.uid}`}
+                                >
+                                    <a>
+                                        {PriscmicDOM.RichText.asText(
+                                            recommendedProduct.data.title
+                                        )}
+                                    </a>
+                                </Link>
                             </li>
                         ))}
                     </ul>
-                    <button type="submit" onClick={handleSum}>
-                        Somar
-                    </button>
                 </section>
             </main>
         </div>
@@ -46,14 +45,13 @@ export default function Home({ recommendedProducts }: HomeProps) {
 }
 
 export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
-    const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/recommended`
-    );
-    const recommendedProducts = await response.json();
+    const recommendedProducts = await client().query([
+        Priscmic.Predicates.at('document.type', 'product'),
+    ]);
 
     return {
         props: {
-            recommendedProducts,
+            recommendedProducts: recommendedProducts.results,
         },
     };
 };

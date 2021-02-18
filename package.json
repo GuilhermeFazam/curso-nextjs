@@ -6,16 +6,19 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "dev:server":" json-server --watch server.json --port 3333"
+        "dev:server": " json-server --watch server.json --port 3333"
     },
     "dependencies": {
         "next": "10.0.6",
+        "prismic-dom": "^2.2.5",
+        "prismic-javascript": "^3.0.2",
         "react": "17.0.1",
         "react-dom": "17.0.1",
         "styled-components": "^5.2.1"
     },
     "devDependencies": {
         "@types/node": "^14.14.25",
+        "@types/prismic-dom": "^2.1.1",
         "@types/react": "^17.0.1",
         "@types/styled-components": "^5.1.7",
         "@typescript-eslint/eslint-plugin": "^4.15.1",
