@@ -1,6 +1,6 @@
 import { GetServerSideProps } from 'next';
-import Head from 'next/head';
-import { Title } from '../styles/pages/Home';
+import { Title } from '@/styles/pages/Home';
+import SEO from '@/components/SEO';
 
 interface IProduct {
     id: string;
@@ -12,11 +12,20 @@ interface HomeProps {
 }
 
 export default function Home({ recommendedProducts }: HomeProps) {
+    async function handleSum() {
+        console.log(process.env.NEXT_PUBLIC_API_URL);
+        const math = (await import('../lib/math')).default;
+        console.error(math.sum(3, 5));
+    }
+
     return (
         <div>
-            <Head>
-                <title>Curso NextJS</title>
-            </Head>
+            <SEO
+                title="Curso NextJS"
+                description="Teste de descripition"
+                image="boost.png"
+                shouldIndexPage
+            />
             <main>
                 <section>
                     <Title>Products</Title>
@@ -27,6 +36,9 @@ export default function Home({ recommendedProducts }: HomeProps) {
                             </li>
                         ))}
                     </ul>
+                    <button type="submit" onClick={handleSum}>
+                        Somar
+                    </button>
                 </section>
             </main>
         </div>
@@ -34,7 +46,9 @@ export default function Home({ recommendedProducts }: HomeProps) {
 }
 
 export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
-    const response = await fetch('http://localhost:3333/recommended');
+    const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/recommended`
+    );
     const recommendedProducts = await response.json();
 
     return {
